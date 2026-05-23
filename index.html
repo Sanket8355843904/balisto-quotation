@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Balisto Agritech</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f2f2f2; min-height: 100vh; }
+  .app { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 2rem; box-shadow: 0 0 30px rgba(0,0,0,0.1); }
+
+  /* HEADER */
+  .header { background: #1a1a1a; padding: 1.25rem 1rem 0; text-align: center; }
+  .logo-area { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-bottom: 0.875rem; }
+  .brand-name { color: #e8440a; font-size: 22px; font-weight: 700; letter-spacing: 3px; line-height: 1; }
+  .brand-sub { color: #999; font-size: 10px; letter-spacing: 5px; font-weight: 400; }
+
+  /* TABS */
+  .tab-bar { display: flex; border-top: 0.5px solid #2a2a2a; }
+  .tab-btn { flex: 1; padding: 11px 8px; font-size: 13px; font-weight: 500; color: #777; background: transparent; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; letter-spacing: 0.3px; }
+  .tab-btn.active { color: #e8440a; border-bottom: 2px solid #e8440a; }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ─── QUOTATION PANEL ─── */
+  .doc-meta { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: #111; }
+  .quot-id { font-size: 10px; color: #aaa; letter-spacing: 1px; }
+  .quot-id span { color: #e8440a; font-weight: 600; }
+  .connected-badge { margin: 0.75rem 1rem 0; background: #0f2e1a; border: 1px solid #1a5c2a; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
+  .connected-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .connected-text { font-size: 11px; color: #4ade80; }
+  .section { padding: 1rem; border-bottom: 1px solid #e5e5e5; }
+  .section-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #e8440a; text-transform: uppercase; margin-bottom: 0.875rem; }
+  .field { margin-bottom: 0.875rem; }
+  .field label { font-size: 12px; color: #555; font-weight: 500; display: block; margin-bottom: 5px; }
+  .field input { width: 100%; padding: 11px 14px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 15px; background: #fff; color: #111; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+  .field input:focus { outline: none; border-color: #e8440a; box-shadow: 0 0 0 3px rgba(232,68,10,0.12); }
+  .field input::placeholder { color: #bbb; }
+  .product-card { background: #fafafa; border-radius: 10px; border: 1.5px solid #e0e0e0; padding: 1rem; margin-bottom: 0.875rem; }
+  .product-header { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+  .product-dot { width: 8px; height: 8px; border-radius: 50%; background: #e8440a; flex-shrink: 0; margin-top: 4px; }
+  .product-name { font-size: 13px; font-weight: 600; color: #111; line-height: 1.4; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+  .mini-field label { font-size: 11px; color: #666; font-weight: 500; display: block; margin-bottom: 4px; }
+  .mini-field input { width: 100%; padding: 9px 11px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 14px; background: #fff; color: #111; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+  .mini-field input:focus { outline: none; border-color: #e8440a; box-shadow: 0 0 0 3px rgba(232,68,10,0.12); }
+  .mini-field input[readonly] { background: #f0f0f0; color: #777; border-color: #ddd; }
+  .discount-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; background: #fff; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 8px 10px; }
+  .discount-row label { font-size: 11px; color: #666; font-weight: 500; white-space: nowrap; }
+  .disc-input { width: 75px; padding: 6px 8px; border: 1.5px solid #e8440a; border-radius: 6px; font-size: 14px; background: #fff9f7; color: #e8440a; font-weight: 600; text-align: center; -webkit-appearance: none; }
+  .disc-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(232,68,10,0.15); }
+  .disc-type { padding: 6px 8px; border: 1.5px solid #ccc; border-radius: 6px; font-size: 12px; background: #fff; color: #333; cursor: pointer; }
+  .saving-badge { font-size: 10px; color: #16a34a; background: #dcfce7; border-radius: 4px; padding: 2px 7px; display: none; white-space: nowrap; font-weight: 600; }
+  .final-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; }
+  .final-label { font-size: 11px; color: #888; }
+  .final-sub-label { font-size: 10px; color: #aaa; margin-top: 1px; }
+  .final-amt { font-size: 16px; font-weight: 700; color: #111; }
+  .subtotal { font-size: 12px; color: #888; margin-top: 8px; text-align: right; }
+  .subtotal span { color: #333; font-weight: 600; }
+  .totals-box { margin: 1rem; background: #1a1a1a; border-radius: 12px; padding: 1rem 1.25rem; }
+  .total-row { display: flex; justify-content: space-between; font-size: 13px; color: #aaa; margin-bottom: 7px; }
+  .savings-row { display: flex; justify-content: space-between; font-size: 12px; color: #4ade80; margin-bottom: 7px; }
+  .grand-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; }
+  .grand-label { font-size: 11px; color: #888; letter-spacing: 2px; }
+  .grand-amount { font-size: 24px; font-weight: 700; color: #e8440a; }
+  .status-box { margin: 0 1rem 1rem; padding: 12px 14px; border-radius: 8px; font-size: 13px; display: none; line-height: 1.6; white-space: pre-line; }
+  .status-box.success { background: #0f2e1a; color: #4ade80; border: 1px solid #1a5c2a; display: block; }
+  .status-box.error { background: #2e0f0f; color: #f87171; border: 1px solid #5c1a1a; display: block; }
+  .status-box.loading { background: #f5f5f5; color: #666; border: 1px solid #ddd; display: block; }
+  .btn-submit { width: calc(100% - 2rem); margin: 0 1rem; background: #e8440a; color: white; border: none; border-radius: 10px; padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .btn-submit:hover { background: #c63a08; }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0.875rem 1rem 0; }
+  .outline-btn { background: white; color: #444; border: 1.5px solid #ccc; border-radius: 10px; padding: 12px 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; width: 100%; }
+  .outline-btn:hover { border-color: #e8440a; color: #e8440a; background: #fff9f7; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; overflow-y: auto; padding: 1rem; flex-direction: column; align-items: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-btn-row { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; max-width: 600px; }
+  .modal-btn-row button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+  .modal-card { background: white; border-radius: 10px; width: 100%; max-width: 600px; overflow: hidden; }
+
+  /* ─── CALCULATOR PANEL ─── */
+  .calc-section { padding: 1rem; }
+  .calc-card { background: #fafafa; border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+  .calc-card-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #e8440a; text-transform: uppercase; margin-bottom: 0.875rem; }
+  .c-field { margin-bottom: 0.875rem; }
+  .c-field label { font-size: 12px; color: #555; font-weight: 500; display: block; margin-bottom: 5px; }
+  .c-input-row { display: flex; align-items: center; gap: 6px; }
+  .c-prefix { font-size: 14px; color: #777; font-weight: 500; flex-shrink: 0; width: 16px; }
+  .c-inp { flex: 1; padding: 11px 12px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 15px; color: #111; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+  .c-inp:focus { outline: none; border-color: #e8440a; box-shadow: 0 0 0 3px rgba(232,68,10,0.12); }
+  .c-suffix { font-size: 12px; color: #999; flex-shrink: 0; }
+  .mode-tabs { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .mode-tab { flex: 1; padding: 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 13px; font-weight: 500; color: #666; background: #fff; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .mode-tab.active { border-color: #e8440a; color: #e8440a; background: rgba(232,68,10,0.05); }
+  .result-dark { background: #1a1a1a; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.875rem; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .r-label { font-size: 10px; letter-spacing: 2px; color: #666; margin-bottom: 3px; }
+  .r-val { font-size: 20px; font-weight: 500; color: #e8440a; }
+  .r-sub { font-size: 11px; color: #555; margin-top: 3px; }
+  .result-footer { font-size: 11px; color: #444; margin-top: 10px; padding-top: 8px; border-top: 0.5px solid #2a2a2a; }
+  .breakdown-card { background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 10px; padding: 0.875rem 1rem; }
+  .brow { display: flex; justify-content: space-between; font-size: 13px; color: #666; padding: 4px 0; }
+  .brow span:last-child { color: #111; font-weight: 500; }
+  .brow.accent span:last-child { color: #e8440a; }
+  .bdivider { border: none; border-top: 0.5px solid #ddd; margin: 6px 0; }
+  .formula-note { font-size: 11px; color: #999; text-align: center; margin-top: 0.75rem; line-height: 1.5; }
+  .formula-note code { font-family: monospace; background: #f0f0f0; padding: 2px 5px; border-radius: 4px; font-size: 11px; color: #555; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-area">
+      <svg width="90" height="52" viewBox="0 0 90 52" fill="none">
+        <path d="M44 26 C38 22 28 20 10 22 L8 24 C14 23 26 24 38 28 Z" fill="#bbb"/>
+        <path d="M44 26 C38 23 30 22 12 25 L10 27 C18 26 30 26 40 29 Z" fill="#999"/>
+        <path d="M44 26 C40 24 32 24 14 27 L12 29 C20 28 32 28 42 30 Z" fill="#777"/>
+        <path d="M46 26 C52 22 62 20 80 22 L82 24 C76 23 64 24 52 28 Z" fill="#bbb"/>
+        <path d="M46 26 C52 23 60 22 78 25 L80 27 C72 26 60 26 50 29 Z" fill="#999"/>
+        <path d="M46 26 C50 24 58 24 76 27 L78 29 C70 28 58 28 48 30 Z" fill="#777"/>
+        <circle cx="45" cy="26" r="13" fill="#333"/><circle cx="45" cy="26" r="11" fill="#444"/>
+        <rect x="43.5" y="11" width="3" height="4" rx="1" fill="#555"/>
+        <rect x="43.5" y="37" width="3" height="4" rx="1" fill="#555"/>
+        <rect x="30" y="24.5" width="4" height="3" rx="1" fill="#555"/>
+        <rect x="56" y="24.5" width="4" height="3" rx="1" fill="#555"/>
+        <rect x="34.5" y="14.5" width="3" height="4" rx="1" fill="#555" transform="rotate(-45 36 16.5)"/>
+        <rect x="54.5" y="33.5" width="3" height="4" rx="1" fill="#555" transform="rotate(-45 56 35.5)"/>
+        <rect x="34.5" y="33.5" width="3" height="4" rx="1" fill="#555" transform="rotate(45 36 35.5)"/>
+        <rect x="54.5" y="14.5" width="3" height="4" rx="1" fill="#555" transform="rotate(45 56 16.5)"/>
+        <circle cx="45" cy="26" r="9" fill="#e8440a"/>
+        <path d="M47 18 L42 26 L46 26 L43 34 L49 24 L45 24 Z" fill="white"/>
+        <circle cx="45" cy="26" r="13" fill="none" stroke="#222" stroke-width="1.5"/>
+      </svg>
+      <div class="brand-name">BALISTO</div>
+      <div class="brand-sub">AGRITECH</div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('quotation')">Quotation</button>
+      <button class="tab-btn" onclick="switchTab('calculator')">Margin Calculator</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- QUOTATION PANEL                        -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="panel-quotation" class="panel active">
+    <div class="doc-meta">
+      <div class="quot-id">NO: <span id="displayId">—</span></div>
+      <div class="quot-id" id="displayDate"></div>
+    </div>
+
+    <div class="connected-badge">
+      <div class="connected-dot"></div>
+      <div class="connected-text">Connected to Google Sheets — ready to save</div>
+    </div>
+
+    <div class="section" style="margin-top:1rem;">
+      <div class="section-title">Customer Details</div>
+      <div class="field"><label>Customer Name *</label><input id="custName" placeholder="Enter full name" /></div>
+      <div class="field"><label>Address</label><input id="custAddress" placeholder="City, State" /></div>
+      <div class="field"><label>Phone Number *</label><input id="custPhone" type="tel" placeholder="+91 XXXXX XXXXX" /></div>
+      <div class="field"><label>Email</label><input id="custEmail" type="email" placeholder="customer@email.com" /></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Products</div>
+
+      <div class="product-card">
+        <div class="product-header"><div class="product-dot"></div><div class="product-name">Single Battery Variant — Balisto 130 Pro 4801</div></div>
+        <div class="two-col">
+          <div class="mini-field"><label>Quantity</label><input id="sbQty" type="number" min="0" value="0" oninput="calcTotals()" /></div>
+          <div class="mini-field"><label>MRP (incl. GST)</label><input value="₹2,25,000" readonly /></div>
+        </div>
+        <div class="discount-row">
+          <label>Discount</label>
+          <input class="disc-input" id="sbDiscVal" type="number" min="0" value="0" placeholder="0" oninput="calcTotals()" />
+          <select class="disc-type" id="sbDiscType" onchange="calcTotals()"><option value="flat">₹ Flat</option><option value="pct">% Off</option></select>
+          <span class="saving-badge" id="sbSaving"></span>
+        </div>
+        <div class="final-price-row">
+          <div><div class="final-label">Final Price / unit</div><div class="final-sub-label" id="sbOrigLine"></div></div>
+          <div class="final-amt" id="sbFinal">₹2,25,000</div>
+        </div>
+        <div class="subtotal">Subtotal: <span id="sbSub">₹0</span></div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-header"><div class="product-dot" style="background:#888"></div><div class="product-name">Double Battery Variant — Balisto 130 Pro 4801</div></div>
+        <div class="two-col">
+          <div class="mini-field"><label>Quantity</label><input id="dbQty" type="number" min="0" value="0" oninput="calcTotals()" /></div>
+          <div class="mini-field"><label>MRP (incl. GST)</label><input value="₹2,75,000" readonly /></div>
+        </div>
+        <div class="discount-row">
+          <label>Discount</label>
+          <input class="disc-input" id="dbDiscVal" type="number" min="0" value="0" placeholder="0" oninput="calcTotals()" />
+          <select class="disc-type" id="dbDiscType" onchange="calcTotals()"><option value="flat">₹ Flat</option><option value="pct">% Off</option></select>
+          <span class="saving-badge" id="dbSaving"></span>
+        </div>
+        <div class="final-price-row">
+          <div><div class="final-label">Final Price / unit</div><div class="final-sub-label" id="dbOrigLine"></div></div>
+          <div class="final-amt" id="dbFinal">₹2,75,000</div>
+        </div>
+        <div class="subtotal">Subtotal: <span id="dbSub">₹0</span></div>
+      </div>
+    </div>
+
+    <div class="totals-box">
+      <div class="total-row"><span>Single Battery</span><span id="t-sb">₹0</span></div>
+      <div class="total-row"><span>Double Battery</span><span id="t-db">₹0</span></div>
+      <div class="total-row" style="color:#555;font-size:11px;"><span>GST 5% (included in price)</span><span id="t-gst">₹0</span></div>
+      <div class="savings-row" id="totalSavingsRow" style="display:none;"><span>Total Savings</span><span id="t-savings">₹0</span></div>
+      <div class="grand-row"><div class="grand-label">GRAND TOTAL</div><div class="grand-amount" id="grandTotal">₹0</div></div>
+    </div>
+
+    <div class="status-box" id="statusBox"></div>
+    <button class="btn-submit" id="submitBtn" onclick="submitQuotation()">Generate &amp; Save Quotation</button>
+    <div class="btn-row">
+      <button class="outline-btn" onclick="showPreview()">&#128065; Preview</button>
+      <button class="outline-btn" onclick="downloadQuotation()">&#8659; Download PDF</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- CALCULATOR PANEL                       -->
+  <!-- ══════════════════════════════════════ -->
+  <div id="panel-calculator" class="panel">
+    <div class="calc-section">
+
+      <div class="calc-card">
+        <div class="calc-card-title">Customer MRP (pre-set, editable)</div>
+        <div class="two-col">
+          <div class="c-field" style="margin-bottom:0;">
+            <label>Single Battery MRP</label>
+            <div class="c-input-row"><span class="c-prefix">₹</span><input class="c-inp" id="cSbMrp" type="number" value="250000" oninput="calcMargin()" /></div>
+          </div>
+          <div class="c-field" style="margin-bottom:0;">
+            <label>Double Battery MRP</label>
+            <div class="c-input-row"><span class="c-prefix">₹</span><input class="c-inp" id="cDbMrp" type="number" value="300000" oninput="calcMargin()" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-card-title">Dealer Margin</div>
+        <div class="mode-tabs">
+          <div class="mode-tab active" id="cTabPct" onclick="setCalcMode('pct')">% Percentage</div>
+          <div class="mode-tab" id="cTabFlat" onclick="setCalcMode('flat')">₹ Flat Amount</div>
+        </div>
+        <div class="c-field" style="margin-bottom:0;">
+          <label id="cMarginLabel">Dealer margin (%)</label>
+          <div class="c-input-row">
+            <span class="c-prefix" id="cMarginPrefix">%</span>
+            <input class="c-inp" id="cMarginVal" type="number" min="0" value="10" step="0.5" oninput="calcMargin()" />
+            <span class="c-suffix" id="cMarginSuffix">on selling price</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-dark">
+        <div class="result-grid">
+          <div>
+            <div class="r-label">SINGLE BATTERY</div>
+            <div class="r-val" id="cSbResult">—</div>
+            <div class="r-sub" id="cSbMarginAmt"></div>
+          </div>
+          <div>
+            <div class="r-label">DOUBLE BATTERY</div>
+            <div class="r-val" id="cDbResult">—</div>
+            <div class="r-sub" id="cDbMarginAmt"></div>
+          </div>
+        </div>
+        <div class="result-footer">Balisto price to dealer (incl. GST)</div>
+      </div>
+
+      <div class="breakdown-card">
+        <div class="brow"><span>SB — Customer pays</span><span id="b-sb-mrp">₹2,50,000</span></div>
+        <div class="brow accent"><span>Dealer margin (SB)</span><span id="b-sb-margin">—</span></div>
+        <div class="brow"><span>Balisto → dealer (SB)</span><span id="b-sb-deal">—</span></div>
+        <div class="bdivider"></div>
+        <div class="brow"><span>DB — Customer pays</span><span id="b-db-mrp">₹3,00,000</span></div>
+        <div class="brow accent"><span>Dealer margin (DB)</span><span id="b-db-margin">—</span></div>
+        <div class="brow"><span>Balisto → dealer (DB)</span><span id="b-db-deal">—</span></div>
+      </div>
+
+      <div class="formula-note" id="cFormulaNot">
+        Formula: <code>Balisto price = MRP ÷ (1 + margin%)</code>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-btn-row">
+    <button style="background:#333;color:white;" onclick="closeModal()">&#10005; Close</button>
+    <button style="background:#e8440a;color:white;" onclick="downloadQuotation()">&#8659; Download PDF</button>
+  </div>
+  <div class="modal-card" id="modalCard"></div>
+</div>
+
+<script>
+/* ─── TAB SWITCHING ─── */
+function switchTab(tab) {
+  document.getElementById('panel-quotation').classList.toggle('active', tab==='quotation');
+  document.getElementById('panel-calculator').classList.toggle('active', tab==='calculator');
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && tab==='quotation') || (i===1 && tab==='calculator'));
+  });
+}
+
+/* ─── SHARED ─── */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxKmULCDAdogCrgOldm3vgTWqdf8BKpMvgc566bFyA3tOFkqeVfNnt2n8TTO5VE_FkYLQ/exec";
+const SB_MRP = 225000;
+const DB_MRP = 275000;
+let currentQuotId = '';
+
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function genId() {
+  const now = new Date(), yr = now.getFullYear(), yr2=(yr+1).toString().slice(2);
+  return 'BALISTO/'+yr+'-'+yr2+'/1/'+Date.now().toString().slice(-4)+(Math.floor(Math.random()*90)+10);
+}
+function refreshId() { currentQuotId=genId(); document.getElementById('displayId').textContent=currentQuotId; }
+refreshId();
+const today=new Date();
+const dd=String(today.getDate()).padStart(2,'0'), mm=String(today.getMonth()+1).padStart(2,'0'), yyyy=today.getFullYear();
+const dateStr=dd+'/'+mm+'/'+yyyy;
+document.getElementById('displayDate').textContent=dateStr;
+
+/* ─── QUOTATION LOGIC ─── */
+function calcDiscountedPrice(mrp,discVal,discType) {
+  const d=parseFloat(discVal)||0;
+  if(discType==='pct') return Math.max(0,mrp-(mrp*Math.min(d,100)/100));
+  return Math.max(0,mrp-d);
+}
+function calcTotals() {
+  const sbQ=parseFloat(document.getElementById('sbQty').value)||0;
+  const dbQ=parseFloat(document.getElementById('dbQty').value)||0;
+  const sbFinalUnit=calcDiscountedPrice(SB_MRP,document.getElementById('sbDiscVal').value,document.getElementById('sbDiscType').value);
+  const dbFinalUnit=calcDiscountedPrice(DB_MRP,document.getElementById('dbDiscVal').value,document.getElementById('dbDiscType').value);
+  const sbDiscount=SB_MRP-sbFinalUnit, dbDiscount=DB_MRP-dbFinalUnit;
+  const sbSub=sbQ*sbFinalUnit, dbSub=dbQ*dbFinalUnit;
+  const grand=sbSub+dbSub, gstIncluded=Math.round(grand-grand/1.05);
+  const totalSavings=(sbQ*sbDiscount)+(dbQ*dbDiscount);
+
+  document.getElementById('sbFinal').textContent=fmt(sbFinalUnit);
+  if(sbDiscount>0){document.getElementById('sbOrigLine').textContent='MRP: '+fmt(SB_MRP)+' · Saving '+fmt(sbDiscount);document.getElementById('sbSaving').textContent=document.getElementById('sbDiscType').value==='pct'?(parseFloat(document.getElementById('sbDiscVal').value)||0).toFixed(1)+'% off':fmt(sbDiscount)+' off';document.getElementById('sbSaving').style.display='inline';}
+  else{document.getElementById('sbOrigLine').textContent='';document.getElementById('sbSaving').style.display='none';}
+  document.getElementById('dbFinal').textContent=fmt(dbFinalUnit);
+  if(dbDiscount>0){document.getElementById('dbOrigLine').textContent='MRP: '+fmt(DB_MRP)+' · Saving '+fmt(dbDiscount);document.getElementById('dbSaving').textContent=document.getElementById('dbDiscType').value==='pct'?(parseFloat(document.getElementById('dbDiscVal').value)||0).toFixed(1)+'% off':fmt(dbDiscount)+' off';document.getElementById('dbSaving').style.display='inline';}
+  else{document.getElementById('dbOrigLine').textContent='';document.getElementById('dbSaving').style.display='none';}
+
+  document.getElementById('sbSub').textContent=fmt(sbSub);
+  document.getElementById('dbSub').textContent=fmt(dbSub);
+  document.getElementById('t-sb').textContent=fmt(sbSub);
+  document.getElementById('t-db').textContent=fmt(dbSub);
+  document.getElementById('t-gst').textContent=fmt(gstIncluded);
+  document.getElementById('grandTotal').textContent=fmt(grand);
+  const sr=document.getElementById('totalSavingsRow');
+  if(totalSavings>0){document.getElementById('t-savings').textContent=fmt(totalSavings);sr.style.display='flex';}
+  else sr.style.display='none';
+  return{sbQ,sbFinalUnit,sbDiscount,sbSub,dbQ,dbFinalUnit,dbDiscount,dbSub,grand,gstIncluded,totalSavings};
+}
+calcTotals();
+
+function showStatus(msg,type){const b=document.getElementById('statusBox');b.className='status-box '+type;b.textContent=msg;}
+
+function buildPrintHTML(t,name,addr,phone,email){
+  const rows=[];
+  if(t.sbQ>0) rows.push('<tr><td>Balisto 130 Pro 4801 — Single Battery Variant</td><td style="text-align:right">'+t.sbQ+'</td><td style="text-align:right">'+fmt(SB_MRP)+'</td><td style="text-align:right;color:#e8440a">'+(t.sbDiscount>0?fmt(t.sbDiscount):'—')+'</td><td style="text-align:right;font-weight:600">'+fmt(t.sbFinalUnit)+'</td><td style="text-align:right;font-weight:600">'+fmt(t.sbSub)+'</td></tr>');
+  if(t.dbQ>0) rows.push('<tr style="background:#fdf5f2"><td>Balisto 130 Pro 4801 — Double Battery Variant</td><td style="text-align:right">'+t.dbQ+'</td><td style="text-align:right">'+fmt(DB_MRP)+'</td><td style="text-align:right;color:#e8440a">'+(t.dbDiscount>0?fmt(t.dbDiscount):'—')+'</td><td style="text-align:right;font-weight:600">'+fmt(t.dbFinalUnit)+'</td><td style="text-align:right;font-weight:600">'+fmt(t.dbSub)+'</td></tr>');
+  if(!rows.length) rows.push('<tr><td colspan="6" style="text-align:center;color:#999;padding:16px;">No products added</td></tr>');
+  const savingsLine=t.totalSavings>0?'<div style="font-size:11px;color:#16a34a;margin-top:6px;text-align:right;">Customer saves '+fmt(t.totalSavings)+' on this quotation</div>':'';
+  return '<div style="padding:28px;color:#111;font-family:Arial,sans-serif;font-size:12px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;"><div><div style="font-size:22px;font-weight:700;color:#e8440a;letter-spacing:2px;">BALISTO</div><div style="font-size:9px;letter-spacing:4px;color:#666;">AGRITECH</div></div><div style="text-align:right;line-height:1.9;color:#444;font-size:11px;"><strong style="color:#111;">Quotation No:</strong> '+currentQuotId+'<br><strong style="color:#111;">Date:</strong> '+dateStr+'</div></div><div style="text-align:center;font-size:16px;font-weight:700;color:#e8440a;border-top:2px solid #e8440a;border-bottom:2px solid #e8440a;padding:7px 0;margin-bottom:16px;">Quotation Summary</div><div style="margin-bottom:16px;line-height:2;color:#333;"><strong>Customer Name:</strong> '+(name||'NA')+'<br><strong>Address:</strong> '+(addr||'NA')+'<br><strong>Phone Number:</strong> '+(phone||'NA')+'<br><strong>Email:</strong> '+(email||'NA')+'</div><div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#e8440a;margin-bottom:6px;">QUOTATION DETAILS:</div><table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px;"><thead><tr><th style="background:#e8440a;color:white;padding:8px;text-align:left;">Item Name</th><th style="background:#e8440a;color:white;padding:8px;text-align:right;">Qty</th><th style="background:#e8440a;color:white;padding:8px;text-align:right;">MRP (incl. GST)</th><th style="background:#e8440a;color:white;padding:8px;text-align:right;">Discount</th><th style="background:#e8440a;color:white;padding:8px;text-align:right;">Final / Unit</th><th style="background:#e8440a;color:white;padding:8px;text-align:right;">Subtotal</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><div style="background:#1a1a1a;color:white;padding:12px 16px;border-radius:8px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;letter-spacing:2px;color:#aaa;">GRAND TOTAL</span><span style="font-size:22px;font-weight:700;color:#e8440a;">'+fmt(t.grand)+'</span></div>'+savingsLine+'<div style="margin:24px 0 12px;"><div style="font-size:9px;letter-spacing:2px;color:#e8440a;margin-bottom:28px;font-weight:700;">AUTHORISED SIGNATORY</div><div style="border-top:0.5px solid #aaa;width:160px;margin-bottom:5px;"></div><div style="font-size:11px;color:#666;">For Higher Orbit Agritech Pvt. Ltd.</div><div style="font-size:12px;font-weight:700;color:#111;">Aishwarya Ramakrishnan</div><div style="font-size:10px;color:#666;">Co-Founder</div></div><div style="border-top:2px solid #e8440a;padding-top:10px;font-size:9px;color:#666;display:flex;justify-content:space-between;"><div><strong style="color:#111;font-size:10px;">HIGHER ORBIT AGRITECH PRIVATE LIMITED</strong><br>Registered Office: A-303/249, Neelam Centre,<br>Baburao Pedharkar Marg, Worli, Mumbai – 400030</div><div style="text-align:right;">CIN: U77302MH2024PTC419028<br>GST: 27AAHCH1976Q1ZS</div></div></div>';
+}
+
+function showPreview(){
+  const t=calcTotals();
+  document.getElementById('modalCard').innerHTML=buildPrintHTML(t,document.getElementById('custName').value,document.getElementById('custAddress').value,document.getElementById('custPhone').value,document.getElementById('custEmail').value);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+
+function downloadQuotation(){
+  const t=calcTotals();
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Quotation '+currentQuotId+'</title><style>body{margin:0;padding:0;}@media print{@page{margin:1cm;}}</style></head><body>'+buildPrintHTML(t,document.getElementById('custName').value||'Customer',document.getElementById('custAddress').value,document.getElementById('custPhone').value,document.getElementById('custEmail').value)+'<script>window.onload=function(){window.print();}<\/script></body></html>';
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='Quotation_'+currentQuotId.replace(/\//g,'-')+'.html';a.click();URL.revokeObjectURL(url);
+}
+
+async function submitQuotation(){
+  const name=document.getElementById('custName').value.trim();
+  const phone=document.getElementById('custPhone').value.trim();
+  if(!name){showStatus('Please enter Customer Name.','error');return;}
+  if(!phone){showStatus('Please enter Phone Number.','error');return;}
+  const t=calcTotals();
+  if(t.grand===0){showStatus('Please add at least one product with quantity > 0.','error');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Saving...';
+  showStatus('Sending to Google Sheets...','loading');
+  const payload={quotationId:currentQuotId,date:dateStr,customerName:name,address:document.getElementById('custAddress').value.trim(),phone,email:document.getElementById('custEmail').value.trim(),sbQty:t.sbQ,sbUnitPrice:t.sbFinalUnit,sbSubtotal:t.sbSub,sbDiscount:t.sbDiscount,dbQty:t.dbQ,dbUnitPrice:t.dbFinalUnit,dbSubtotal:t.dbSub,dbDiscount:t.dbDiscount,totalSavings:t.totalSavings,gstIncluded:t.gstIncluded,grandTotal:t.grand};
+  try{
+    const formData=new URLSearchParams();
+    Object.entries(payload).forEach(([k,v])=>formData.append(k,String(v)));
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:formData.toString()});
+    showStatus('✓ Saved to Google Sheets!\nQuotation ID: '+currentQuotId,'success');
+    setTimeout(()=>{refreshId();},1500);
+  }catch(err){showStatus('⚠ Network error: '+err.message,'error');}
+  btn.disabled=false;btn.textContent='Generate & Save Quotation';
+}
+
+/* ─── CALCULATOR LOGIC ─── */
+let calcMode='pct';
+
+function setCalcMode(m){
+  calcMode=m;
+  document.getElementById('cTabPct').className='mode-tab'+(m==='pct'?' active':'');
+  document.getElementById('cTabFlat').className='mode-tab'+(m==='flat'?' active':'');
+  if(m==='pct'){
+    document.getElementById('cMarginLabel').textContent='Dealer margin (%)';
+    document.getElementById('cMarginPrefix').textContent='%';
+    document.getElementById('cMarginSuffix').textContent='on selling price';
+    document.getElementById('cMarginVal').step='0.5';
+    document.getElementById('cFormulaNot').innerHTML='Formula: <code>Balisto price = MRP ÷ (1 + margin%)</code>';
+  } else {
+    document.getElementById('cMarginLabel').textContent='Dealer margin (₹ flat)';
+    document.getElementById('cMarginPrefix').textContent='₹';
+    document.getElementById('cMarginSuffix').textContent='per unit';
+    document.getElementById('cMarginVal').step='500';
+    document.getElementById('cFormulaNot').innerHTML='Formula: <code>Balisto price = MRP − flat margin</code>';
+  }
+  calcMargin();
+}
+
+function calcMargin(){
+  const sbMrp=parseFloat(document.getElementById('cSbMrp').value)||0;
+  const dbMrp=parseFloat(document.getElementById('cDbMrp').value)||0;
+  const mVal=parseFloat(document.getElementById('cMarginVal').value)||0;
+  let sbDeal,dbDeal,sbMargin,dbMargin;
+  if(calcMode==='pct'){
+    const r=mVal/100;
+    sbDeal=sbMrp/(1+r); dbDeal=dbMrp/(1+r);
+    sbMargin=sbMrp-sbDeal; dbMargin=dbMrp-dbDeal;
+    document.getElementById('cSbMarginAmt').textContent='margin '+fmt(sbMargin);
+    document.getElementById('cDbMarginAmt').textContent='margin '+fmt(dbMargin);
+    document.getElementById('b-sb-margin').textContent=mVal.toFixed(1)+'% → '+fmt(sbMargin);
+    document.getElementById('b-db-margin').textContent=mVal.toFixed(1)+'% → '+fmt(dbMargin);
+  } else {
+    sbDeal=Math.max(0,sbMrp-mVal); dbDeal=Math.max(0,dbMrp-mVal);
+    sbMargin=mVal; dbMargin=mVal;
+    document.getElementById('cSbMarginAmt').textContent='margin '+fmt(mVal);
+    document.getElementById('cDbMarginAmt').textContent='margin '+fmt(mVal);
+    document.getElementById('b-sb-margin').textContent=fmt(mVal);
+    document.getElementById('b-db-margin').textContent=fmt(mVal);
+  }
+  document.getElementById('cSbResult').textContent=fmt(sbDeal);
+  document.getElementById('cDbResult').textContent=fmt(dbDeal);
+  document.getElementById('b-sb-mrp').textContent=fmt(sbMrp);
+  document.getElementById('b-db-mrp').textContent=fmt(dbMrp);
+  document.getElementById('b-sb-deal').textContent=fmt(sbDeal);
+  document.getElementById('b-db-deal').textContent=fmt(dbDeal);
+}
+calcMargin();
+</script>
+</body>
+</html>
